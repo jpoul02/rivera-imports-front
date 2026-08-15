@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { LogOut } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -13,12 +14,13 @@ import { ThemeToggle } from "@/components/common/ThemeToggle";
 export function LogoRivera({ compact = false }: { compact?: boolean }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="relative flex h-10 w-10 items-center justify-center bg-primary rounded-sm">
-        <span className="display-title text-xl leading-none text-primary-foreground">
-          RI
-        </span>
-        <div className="absolute -bottom-1 left-0 right-0 h-0.5 racing-stripe" />
-      </div>
+      <Image
+        src="/pickup.svg"
+        alt="Rivera Imports"
+        width={324}
+        height={110}
+        className="h-9 w-auto"
+      />
       {!compact && (
         <div className="leading-none">
           <p className="display-title text-lg text-white tracking-wider">RIVERA</p>

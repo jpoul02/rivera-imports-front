@@ -2,12 +2,12 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Search } from "lucide-react";
 import { api } from "@/lib/api";
 import { useFetch } from "@/hooks/use-fetch";
 import { formatMoney } from "@/lib/format";
 import { FotoArticulo } from "@/components/common/FotoArticulo";
-import { BlueprintRotor } from "@/components/common/BlueprintRotor";
 import { Paginacion } from "@/components/common/Paginacion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -43,32 +43,27 @@ export default function CatalogoPage() {
   return (
     <div>
       {/* Hero */}
-      <div className="relative overflow-hidden border-b border-neutral-800 bg-neutral-950">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage:
-              "linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)",
-            backgroundSize: "36px 36px",
-          }}
+      <div className="relative isolate overflow-hidden border-b border-neutral-800">
+        <Image
+          src="/pickup.png"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
         />
-        <div className="relative mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-6 lg:grid-cols-5 lg:items-center lg:py-16">
-          <div className="lg:col-span-3">
-            <p className="font-mono text-xs tracking-[0.25em] text-neutral-500">CATÁLOGO</p>
-            <h1 className="display-title mt-2 text-4xl text-white sm:text-5xl">
-              REPUESTOS Y PARTES
-            </h1>
-            <p className="mt-3 max-w-lg text-sm text-neutral-400">
-              Navegá el catálogo de Rivera Imports. Agregá lo que te interesa a tu lista y
-              consultá disponibilidad por WhatsApp.
-            </p>
-          </div>
-          <div className="hidden justify-center lg:col-span-2 lg:flex">
-            <BlueprintRotor className="h-auto w-56 max-w-none lg:w-64" />
-          </div>
+        <div aria-hidden className="absolute inset-0 bg-neutral-950/70" />
+        <div className="relative z-10 mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">
+          <p className="font-mono text-xs tracking-[0.25em] text-neutral-300">CATÁLOGO</p>
+          <h1 className="display-title mt-2 text-4xl text-white sm:text-5xl">
+            REPUESTOS Y PARTES
+          </h1>
+          <p className="mt-3 max-w-lg text-sm text-neutral-300">
+            Navegá el catálogo de Rivera Imports. Agregá lo que te interesa a tu lista y
+            consultá disponibilidad por WhatsApp.
+          </p>
         </div>
-        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-1 racing-stripe" />
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-1 racing-stripe" />
       </div>
 
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">

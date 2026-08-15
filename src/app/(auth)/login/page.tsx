@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { toast } from "sonner";
 import { Eye, EyeOff, Loader2, LogIn } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -85,9 +86,13 @@ export default function LoginPage() {
         <RegistrationMark className="pointer-events-none absolute right-4 bottom-4 hidden h-4 w-4 text-neutral-700 lg:block" />
 
         <div className="relative z-10 flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-sm bg-primary">
-            <span className="display-title text-lg leading-none text-primary-foreground">RI</span>
-          </div>
+          <Image
+            src="/pickup.svg"
+            alt="Rivera Imports"
+            width={324}
+            height={110}
+            className="h-9 w-auto"
+          />
           <span className="display-title text-sm tracking-[0.3em] text-neutral-500">
             RIVERA IMPORTS
           </span>
