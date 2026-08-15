@@ -186,6 +186,7 @@ export function DashboardScreen() {
                   <FotoArticulo
                     src={a.foto}
                     alt={a.nombre}
+                    categoria={a.categoria}
                     className="h-10 w-10 rounded-md"
                     iconClassName="w-4 h-4"
                     sizes="40px"

@@ -203,6 +203,7 @@ export function ProductDetailScreen({ id }: { id: string }) {
           <FotoArticulo
             src={articulo.foto}
             alt={articulo.nombre}
+            categoria={articulo.categoria}
             className="aspect-square w-full"
             iconClassName="w-16 h-16"
             sizes="(max-width: 1024px) 100vw, 480px"

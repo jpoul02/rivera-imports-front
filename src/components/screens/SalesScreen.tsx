@@ -277,6 +277,7 @@ export function SalesScreen({ defaultTab }: { defaultTab: string }) {
                     <FotoArticulo
                       src={articulo.foto}
                       alt={articulo.nombre}
+                      categoria={articulo.categoria}
                       className="h-14 w-14 shrink-0 rounded-md"
                       sizes="56px"
                     />

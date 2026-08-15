@@ -219,6 +219,7 @@ export function InventoryScreen() {
                   <FotoArticulo
                     src={a.foto}
                     alt={a.nombre}
+                    categoria={a.categoria}
                     className="h-11 w-11 rounded-md"
                     iconClassName="w-4 h-4"
                     sizes="44px"
@@ -267,6 +268,7 @@ export function InventoryScreen() {
                 <FotoArticulo
                   src={a.foto}
                   alt={a.nombre}
+                  categoria={a.categoria}
                   className="h-16 w-16 shrink-0 rounded-md"
                   sizes="64px"
                 />
