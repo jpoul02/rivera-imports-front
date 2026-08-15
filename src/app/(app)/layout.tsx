@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { AppProvider } from "@/context/AppContext";
 import { canAccessPath, homePath } from "@/lib/permissions";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { MobileHeader } from "@/components/layout/MobileHeader";
@@ -44,12 +45,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen">
-      <Sidebar />
-      <div className="flex min-h-screen flex-col lg:pl-60">
-        <MobileHeader />
-        <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
+    <AppProvider>
+      <div className="min-h-screen">
+        <Sidebar />
+        <div className="flex min-h-screen flex-col lg:pl-60">
+          <MobileHeader />
+          <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
+        </div>
       </div>
-    </div>
+    </AppProvider>
   );
 }
