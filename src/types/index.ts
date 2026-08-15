@@ -28,7 +28,26 @@ export interface Articulo {
   precio: number;
   descripcion: string;
   stock: number;
+  visible_publico: boolean;
   fecha_ingreso: string;
+}
+
+export interface CatalogoArticulo {
+  id: number;
+  nombre: string;
+  categoria: string;
+  marca: string;
+  modelo: string;
+  foto: string;
+  precio: number;
+  descripcion: string;
+  disponible: boolean;
+}
+
+export interface CatalogoPublico {
+  articulos: CatalogoArticulo[];
+  categorias: CatalogoItem[];
+  marcas: CatalogoItem[];
 }
 
 export type TipoMovimiento = "entrada" | "salida" | "ajuste";
