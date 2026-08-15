@@ -3,6 +3,8 @@ import type {
   AnalyticsData,
   AppConfig,
   Articulo,
+  CatalogoArticulo,
+  CatalogoPublico,
   Catalogos,
   DashboardData,
   MovimientoStock,
@@ -83,6 +85,12 @@ export const api = {
     (await apiClient.get<MovimientoStock[]>(`/articulos/${id}/movimientos`)).data,
   ajustarStock: async (id: number, data: { tipo: "entrada" | "salida"; cantidad: number; nota: string }) =>
     (await apiClient.post<Articulo>(`/articulos/${id}/movimientos`, data)).data,
+
+  // Catálogo público
+  getCatalogoPublico: async () =>
+    (await apiClient.get<CatalogoPublico>("/catalogo")).data,
+  getCatalogoArticulo: async (id: number) =>
+    (await apiClient.get<CatalogoArticulo>(`/catalogo/articulos/${id}`)).data,
 
   // Catálogos
   getCatalogos: async () => (await apiClient.get<Catalogos>("/catalogos")).data,
