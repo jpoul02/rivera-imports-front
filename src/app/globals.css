@@ -140,6 +140,18 @@
   }
 }
 
+/* Giro lento del rotor — BlueprintRotor */
+@keyframes rotor-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.rotor-spin {
+  transform-origin: 200px 200px;
+  animation: rotor-spin 24s linear infinite;
+}
+
 /* Franja racing — detalle de marca */
 .racing-stripe {
   background: linear-gradient(

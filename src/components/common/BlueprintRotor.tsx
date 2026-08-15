@@ -1,17 +1,22 @@
 import { cn } from "@/lib/utils";
 
 /** Plano de despiece — disco de freno ventilado, vista explosionada. Firma visual de la marca. */
+/** Redondeo a 2 decimales — evita que Math.cos/sin difiera en el último bit entre server y cliente y dispare falsos hydration mismatch. */
+function r(n: number) {
+  return Math.round(n * 100) / 100;
+}
+
 export function BlueprintRotor({ className }: { className?: string }) {
   const holes = Array.from({ length: 5 }).map((_, i) => {
     const angle = (i / 5) * Math.PI * 2 - Math.PI / 2;
-    return { cx: 200 + Math.cos(angle) * 78, cy: 200 + Math.sin(angle) * 78 };
+    return { cx: r(200 + Math.cos(angle) * 78), cy: r(200 + Math.sin(angle) * 78) };
   });
   const vents = Array.from({ length: 28 }).map((_, i) => {
     const angle = (i / 28) * Math.PI * 2;
-    const x1 = 200 + Math.cos(angle) * 106;
-    const y1 = 200 + Math.sin(angle) * 106;
-    const x2 = 200 + Math.cos(angle) * 130;
-    const y2 = 200 + Math.sin(angle) * 130;
+    const x1 = r(200 + Math.cos(angle) * 106);
+    const y1 = r(200 + Math.sin(angle) * 106);
+    const x2 = r(200 + Math.cos(angle) * 130);
+    const y2 = r(200 + Math.sin(angle) * 130);
     return { x1, y1, x2, y2 };
   });
 
@@ -22,18 +27,20 @@ export function BlueprintRotor({ className }: { className?: string }) {
       fill="none"
       stroke="currentColor"
     >
-      {/* rotor */}
-      <circle cx="200" cy="200" r="150" strokeWidth="1.25" />
-      <circle cx="200" cy="200" r="130" strokeWidth="0.75" opacity="0.5" />
-      <circle cx="200" cy="200" r="106" strokeWidth="0.75" opacity="0.5" />
-      <circle cx="200" cy="200" r="42" strokeWidth="1.25" />
-      <circle cx="200" cy="200" r="10" strokeWidth="1" className="text-primary" opacity="0.8" />
-      {vents.map((v, i) => (
-        <line key={i} x1={v.x1} y1={v.y1} x2={v.x2} y2={v.y2} strokeWidth="0.75" opacity="0.4" />
-      ))}
-      {holes.map((h, i) => (
-        <circle key={i} cx={h.cx} cy={h.cy} r="8" strokeWidth="1" />
-      ))}
+      {/* rotor — gira despacio en el sentido que marca la flecha */}
+      <g className="rotor-spin">
+        <circle cx="200" cy="200" r="150" strokeWidth="1.25" />
+        <circle cx="200" cy="200" r="130" strokeWidth="0.75" opacity="0.5" />
+        <circle cx="200" cy="200" r="106" strokeWidth="0.75" opacity="0.5" />
+        <circle cx="200" cy="200" r="42" strokeWidth="1.25" />
+        <circle cx="200" cy="200" r="10" strokeWidth="1" className="text-primary" opacity="0.8" />
+        {vents.map((v, i) => (
+          <line key={i} x1={v.x1} y1={v.y1} x2={v.x2} y2={v.y2} strokeWidth="0.75" opacity="0.4" />
+        ))}
+        {holes.map((h, i) => (
+          <circle key={i} cx={h.cx} cy={h.cy} r="8" strokeWidth="1" />
+        ))}
+      </g>
 
       {/* flecha de sentido de giro */}
       <path

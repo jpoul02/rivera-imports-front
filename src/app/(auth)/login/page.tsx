@@ -91,6 +91,7 @@ export default function LoginPage() {
             alt="Rivera Imports"
             width={324}
             height={110}
+            priority
             className="h-9 w-auto"
           />
           <span className="display-title text-sm tracking-[0.3em] text-neutral-500">
