@@ -8,6 +8,8 @@ import { api } from "@/lib/api";
 import { useFetch } from "@/hooks/use-fetch";
 import { formatMoney } from "@/lib/format";
 import { FotoArticulo } from "@/components/common/FotoArticulo";
+import { AgregarAListaButton } from "@/components/catalogo/AgregarAListaButton";
+import { CatalogoSplash } from "@/components/catalogo/CatalogoSplash";
 import { Paginacion } from "@/components/common/Paginacion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -42,6 +44,8 @@ export default function CatalogoPage() {
 
   return (
     <div>
+      <CatalogoSplash />
+
       {/* Hero */}
       <div className="relative isolate overflow-hidden border-b border-neutral-800">
         <Image
@@ -56,7 +60,7 @@ export default function CatalogoPage() {
         <div className="relative z-10 mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">
           <p className="font-mono text-xs tracking-[0.25em] text-neutral-300">CATÁLOGO</p>
           <h1 className="display-title mt-2 text-4xl text-white sm:text-5xl">
-            REPUESTOS Y PARTES
+            REPUESTOS Y AUTOPARTES
           </h1>
           <p className="mt-3 max-w-lg text-sm text-neutral-300">
             Navegá el catálogo de Rivera Imports. Agregá lo que te interesa a tu lista y
@@ -124,8 +128,11 @@ export default function CatalogoPage() {
           <>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {paginados.map((a) => (
-                <Link key={a.id} href={`/catalogo/${a.id}`}>
-                  <Card className="h-full gap-3 overflow-hidden py-0 transition-colors duration-150 hover:border-primary/40">
+                <Card
+                  key={a.id}
+                  className="h-full gap-3 overflow-hidden py-0 transition-colors duration-150 hover:border-primary/40"
+                >
+                  <Link href={`/catalogo/${a.id}`} className="contents">
                     <FotoArticulo
                       src={a.foto}
                       alt={a.nombre}
@@ -151,8 +158,11 @@ export default function CatalogoPage() {
                         </Badge>
                       </div>
                     </CardContent>
-                  </Card>
-                </Link>
+                  </Link>
+                  <div className="px-3 pb-3">
+                    <AgregarAListaButton articuloId={a.id} nombre={a.nombre} className="w-full" />
+                  </div>
+                </Card>
               ))}
             </div>
 

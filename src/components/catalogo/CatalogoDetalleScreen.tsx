@@ -6,6 +6,7 @@ import { api } from "@/lib/api";
 import { useFetch } from "@/hooks/use-fetch";
 import { formatMoney } from "@/lib/format";
 import { FotoArticulo } from "@/components/common/FotoArticulo";
+import { AgregarAListaButton } from "@/components/catalogo/AgregarAListaButton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -84,6 +85,8 @@ export function CatalogoDetalleScreen({ id }: { id: string }) {
           </div>
 
           <p className="text-sm leading-relaxed text-foreground/80">{articulo.descripcion}</p>
+
+          <AgregarAListaButton articuloId={articulo.id} nombre={articulo.nombre} />
         </div>
       </div>
     </div>

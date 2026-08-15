@@ -91,6 +91,7 @@ export const api = {
     (await apiClient.get<CatalogoPublico>("/catalogo")).data,
   getCatalogoArticulo: async (id: number) =>
     (await apiClient.get<CatalogoArticulo>(`/catalogo/articulos/${id}`)).data,
+  consultarWhatsapp: async () => apiClient.post("/catalogo/consulta-whatsapp"),
 
   // Catálogos
   getCatalogos: async () => (await apiClient.get<Catalogos>("/catalogos")).data,
