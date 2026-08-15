@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { createElement, useState } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { categoriaIcon } from "@/lib/category-icons";
@@ -37,10 +37,10 @@ export function FotoArticulo({
       {showFallback ? (
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="absolute inset-x-0 top-0 h-1 racing-stripe opacity-80" />
-          <Icono
-            className={cn("text-neutral-700", iconClassName ?? "w-8 h-8")}
-            strokeWidth={1.5}
-          />
+          {createElement(Icono, {
+            className: cn("text-neutral-700", iconClassName ?? "w-8 h-8"),
+            strokeWidth: 1.5,
+          })}
         </div>
       ) : (
         <Image

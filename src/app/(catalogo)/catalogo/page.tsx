@@ -24,11 +24,9 @@ export default function CatalogoPage() {
   const [categoria, setCategoria] = useState("");
   const [pagina, setPagina] = useState(1);
 
-  const articulos = data?.articulos ?? [];
-
   const filtrados = useMemo(() => {
     const q = busqueda.trim().toLowerCase();
-    return articulos.filter((a) => {
+    return (data?.articulos ?? []).filter((a) => {
       if (categoria && a.categoria !== categoria) return false;
       if (
         q &&
@@ -37,7 +35,7 @@ export default function CatalogoPage() {
         return false;
       return true;
     });
-  }, [articulos, busqueda, categoria]);
+  }, [data, busqueda, categoria]);
 
   const totalPaginas = Math.max(1, Math.ceil(filtrados.length / POR_PAGINA));
   const paginados = filtrados.slice((pagina - 1) * POR_PAGINA, pagina * POR_PAGINA);
@@ -68,7 +66,7 @@ export default function CatalogoPage() {
           </div>
           <div className="flex justify-center lg:col-span-2">
             <Image
-              src="/logo.jpeg"
+              src="/logo.svg"
               alt="Rivera Imports"
               width={320}
               height={400}
