@@ -9,6 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 import { formatMoney } from "@/lib/format";
 import { FotoArticulo } from "@/components/common/FotoArticulo";
 import { ComboboxSelect } from "@/components/common/ComboboxSelect";
+import { Paginacion } from "@/components/common/Paginacion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -41,6 +42,8 @@ export function InventoryScreen() {
   const [marcaId, setMarcaId] = useState("");
   const [soloStockBajo, setSoloStockBajo] = useState(false);
   const [filtrosOpen, setFiltrosOpen] = useState(false);
+  const [pagina, setPagina] = useState(1);
+  const porPagina = 20;
 
   const appliedCount = [categoriaId, marcaId, soloStockBajo ? "1" : ""].filter(Boolean).length;
 
@@ -57,10 +60,22 @@ export function InventoryScreen() {
     });
   }, [articulos, busqueda, categoriaId, marcaId, soloStockBajo, umbral]);
 
+  const totalPaginas = Math.max(1, Math.ceil(filtrados.length / porPagina));
+
+  if (pagina > totalPaginas) {
+    setPagina(totalPaginas);
+  }
+
+  const paginados = useMemo(
+    () => filtrados.slice((pagina - 1) * porPagina, pagina * porPagina),
+    [filtrados, pagina]
+  );
+
   const limpiarFiltros = () => {
     setCategoriaId("");
     setMarcaId("");
     setSoloStockBajo(false);
+    setPagina(1);
   };
 
   const stockBadge = (stock: number) => {
@@ -109,7 +124,10 @@ export function InventoryScreen() {
           <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
+            onChange={(e) => {
+              setBusqueda(e.target.value);
+              setPagina(1);
+            }}
             placeholder="Buscar por nombre, marca, modelo o categoría..."
             className="h-10 pl-9"
           />
@@ -134,7 +152,10 @@ export function InventoryScreen() {
                   label: c.nombre,
                 }))}
                 value={categoriaId}
-                onChange={setCategoriaId}
+                onChange={(v) => {
+                  setCategoriaId(v);
+                  setPagina(1);
+                }}
                 placeholder="Todas las categorías"
               />
             </div>
@@ -146,14 +167,20 @@ export function InventoryScreen() {
                   label: m.nombre,
                 }))}
                 value={marcaId}
-                onChange={setMarcaId}
+                onChange={(v) => {
+                  setMarcaId(v);
+                  setPagina(1);
+                }}
                 placeholder="Todas las marcas"
               />
             </div>
             <Button
               variant={soloStockBajo ? "default" : "outline"}
               className="h-10 w-full"
-              onClick={() => setSoloStockBajo((v) => !v)}
+              onClick={() => {
+                setSoloStockBajo((v) => !v);
+                setPagina(1);
+              }}
             >
               Solo stock bajo
             </Button>
@@ -186,7 +213,7 @@ export function InventoryScreen() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filtrados.map((a) => (
+            {paginados.map((a) => (
               <TableRow key={a.id} className="group">
                 <TableCell className="py-2">
                   <FotoArticulo
@@ -233,7 +260,7 @@ export function InventoryScreen() {
 
       {/* Cards móvil */}
       <div className="grid gap-3 md:hidden">
-        {filtrados.map((a) => (
+        {paginados.map((a) => (
           <Link key={a.id} href={`/products/${a.id}`}>
             <Card className="py-0 transition-colors duration-150 active:bg-muted">
               <CardContent className="flex items-center gap-3 p-3">
@@ -265,6 +292,18 @@ export function InventoryScreen() {
           </p>
         )}
       </div>
+
+      {filtrados.length > 0 && (
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <p className="text-sm text-muted-foreground">
+            Mostrando <span className="font-medium text-foreground">
+              {(pagina - 1) * porPagina + 1}–{Math.min(pagina * porPagina, filtrados.length)}
+            </span>{" "}
+            de {filtrados.length} artículos
+          </p>
+          <Paginacion pagina={pagina} totalPaginas={totalPaginas} onCambiar={setPagina} />
+        </div>
+      )}
     </div>
   );
 }
