@@ -16,6 +16,7 @@ import { useFetch } from "@/hooks/use-fetch";
 import { useAuth } from "@/context/AuthContext";
 import { formatMoney, formatDate } from "@/lib/format";
 import { FotoArticulo } from "@/components/common/FotoArticulo";
+import { SubirFotoArticulo } from "@/components/common/SubirFotoArticulo";
 import { ComboboxSelect } from "@/components/common/ComboboxSelect";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -72,11 +73,11 @@ export function ProductDetailScreen({ id }: { id: string }) {
     categoriaId: "",
     marcaId: "",
     modeloId: "",
-    foto: "",
     precio: "",
     descripcion: "",
     visiblePublico: false,
   });
+  const [fotoFile, setFotoFile] = useState<File | null>(null);
   const [ajuste, setAjuste] = useState({
     tipo: "entrada" as "entrada" | "salida",
     cantidad: "",
@@ -121,11 +122,11 @@ export function ProductDetailScreen({ id }: { id: string }) {
       categoriaId: String(articulo.categoria_id),
       marcaId: String(articulo.marca_id),
       modeloId: String(articulo.modelo_id),
-      foto: articulo.foto,
       precio: String(articulo.precio),
       descripcion: articulo.descripcion,
       visiblePublico: articulo.visible_publico,
     });
+    setFotoFile(null);
     setEditOpen(true);
   };
 
@@ -145,11 +146,17 @@ export function ProductDetailScreen({ id }: { id: string }) {
         categoria_id: Number(edit.categoriaId),
         marca_id: Number(edit.marcaId),
         modelo_id: Number(edit.modeloId),
-        foto: edit.foto.trim(),
         precio,
         descripcion: edit.descripcion.trim(),
         visible_publico: edit.visiblePublico,
       });
+      if (fotoFile) {
+        try {
+          await api.subirImagenArticulo(articulo.id, fotoFile);
+        } catch (error) {
+          toast.error(mensajeDeError(error, "Artículo actualizado, pero la foto no se pudo subir"));
+        }
+      }
       setEditOpen(false);
       toast.success("Artículo actualizado");
       refetch();
@@ -477,13 +484,11 @@ export function ProductDetailScreen({ id }: { id: string }) {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="e-foto">URL de fotografía</Label>
-              <Input
-                id="e-foto"
-                value={edit.foto}
-                onChange={(e) => setEdit((f) => ({ ...f, foto: e.target.value }))}
-                placeholder="https://..."
-                className="h-10"
+              <Label>Fotografía</Label>
+              <SubirFotoArticulo
+                fotoActual={articulo.foto}
+                nombre={edit.nombre}
+                onFileChange={setFotoFile}
               />
             </div>
             <div className="space-y-2">

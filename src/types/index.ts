@@ -93,6 +93,7 @@ export interface Usuario {
   notif_nueva_venta: boolean;
   notif_stock_bajo: boolean;
   notif_reporte_diario: boolean;
+  debe_cambiar_password: boolean;
 }
 
 export type UserRole = "administrador" | "gestor" | "vendedor";

@@ -81,6 +81,11 @@ export const api = {
   actualizarArticulo: async (id: number, data: Partial<Omit<Articulo, "id" | "stock">>) =>
     (await apiClient.patch<Articulo>(`/articulos/${id}`, data)).data,
   eliminarArticulo: async (id: number) => apiClient.delete(`/articulos/${id}`),
+  subirImagenArticulo: async (id: number, archivo: File) => {
+    const formData = new FormData();
+    formData.append("archivo", archivo);
+    return (await apiClient.post<Articulo>(`/articulos/${id}/imagen`, formData)).data;
+  },
   getMovimientos: async (id: number) =>
     (await apiClient.get<MovimientoStock[]>(`/articulos/${id}/movimientos`)).data,
   ajustarStock: async (id: number, data: { tipo: "entrada" | "salida"; cantidad: number; nota: string }) =>
@@ -123,13 +128,8 @@ export const api = {
 
   // Usuarios
   getUsuarios: async () => (await apiClient.get<Usuario[]>("/usuarios")).data,
-  crearUsuario: async (data: {
-    nombre: string;
-    usuario: string;
-    password: string;
-    email?: string;
-    roles: string[];
-  }) => (await apiClient.post<Usuario>("/usuarios", data)).data,
+  crearUsuario: async (data: { nombre: string; usuario: string; email: string; roles: string[] }) =>
+    (await apiClient.post<Usuario>("/usuarios", data)).data,
   actualizarUsuario: async (
     id: number,
     data: Partial<{ nombre: string; email: string; activo: boolean; password: string; roles: string[] }>

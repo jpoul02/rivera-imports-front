@@ -211,6 +211,16 @@ no hay build step que los sincronice, hay que acordarse.
 - **Bot de WhatsApp con disponibilidad automática** — requiere WhatsApp Business API,
   matching de mensajes con catálogo, endpoint backend nuevo. Descartado, el usuario
   aclaró que solo quiere que las alertas lleguen a un número fijo, no un bot.
+- **"Bot" guía de compra en el sitio (2026-08-15, no confundir con el de arriba)** —
+  NO es WhatsApp Business API. Es un widget en el propio sitio (tipo wizard/chat):
+  le pregunta al visitante qué busca y cuánta cantidad quiere, y al final lo lleva a
+  un apartado de compra. Fase "pre-tienda" — pensado para cuando exista un flujo de
+  compra real en el sitio (hoy no existe, solo WhatsApp vía lista de interés). El
+  usuario mismo lo marcó como "anotar para el futuro, tal vez maquetar" — no
+  implementar sin retomar. Related: `ListaInteresFlotante.tsx` ya cubre la versión
+  simple ("consultar por WhatsApp" con lista armada) que el usuario consideró
+  suficiente por ahora ("creo que lo más rápido es lo que tenemos... hacer consultas
+  como tal").
 - **Sistema de código/lookup para carritos guardado en DB** — descartado dos veces
   (brainstorming inicial + de nuevo cuando se armó la lista compartida). El código
   base64url en la URL (sin DB) cumple lo mismo.

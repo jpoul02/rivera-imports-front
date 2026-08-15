@@ -10,10 +10,11 @@ import { MobileHeader } from "@/components/layout/MobileHeader";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isLoading, permisos } = useAuth();
+  const { user, isAuthenticated, isLoading, permisos } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
 
+  const debeCambiarPassword = !!user?.debe_cambiar_password;
   const allowed = canAccessPath(pathname, permisos);
 
   useEffect(() => {
@@ -22,12 +23,21 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       router.replace("/login");
       return;
     }
+    if (debeCambiarPassword) {
+      if (pathname !== "/cambiar-password") router.replace("/cambiar-password");
+      return;
+    }
     if (!allowed) {
       router.replace(homePath(permisos));
     }
-  }, [isLoading, isAuthenticated, allowed, permisos, router]);
+  }, [isLoading, isAuthenticated, debeCambiarPassword, pathname, allowed, permisos, router]);
 
-  if (isLoading || !isAuthenticated || !allowed) {
+  if (
+    isLoading ||
+    !isAuthenticated ||
+    (debeCambiarPassword && pathname !== "/cambiar-password") ||
+    (!debeCambiarPassword && !allowed)
+  ) {
     return (
       <div className="flex min-h-screen">
         <div className="hidden w-60 bg-sidebar lg:block" />

@@ -42,7 +42,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await api.login(usuario, password);
       localStorage.setItem(TOKEN_KEY, data.access_token);
       setUser(data.usuario);
-      router.push(homePath(data.usuario.permisos));
+      router.push(
+        data.usuario.debe_cambiar_password ? "/cambiar-password" : homePath(data.usuario.permisos)
+      );
     },
     [router]
   );

@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { ArrowLeft, ImageIcon, Loader2 } from "lucide-react";
 import { api, mensajeDeError } from "@/lib/api";
 import { useFetch } from "@/hooks/use-fetch";
-import { FotoArticulo } from "@/components/common/FotoArticulo";
+import { SubirFotoArticulo } from "@/components/common/SubirFotoArticulo";
 import { ComboboxSelect } from "@/components/common/ComboboxSelect";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +19,6 @@ interface FormState {
   categoriaId: string;
   marcaId: string;
   modeloId: string;
-  foto: string;
   precio: string;
   stock: string;
   descripcion: string;
@@ -30,7 +29,6 @@ const inicial: FormState = {
   categoriaId: "",
   marcaId: "",
   modeloId: "",
-  foto: "",
   precio: "",
   stock: "0",
   descripcion: "",
@@ -40,6 +38,7 @@ export function AddProductScreen() {
   const { data: catalogos } = useFetch(api.getCatalogos);
   const router = useRouter();
   const [form, setForm] = useState<FormState>(inicial);
+  const [fotoFile, setFotoFile] = useState<File | null>(null);
   const [errores, setErrores] = useState<Partial<Record<keyof FormState, string>>>({});
   const [enviando, setEnviando] = useState(false);
 
@@ -79,11 +78,18 @@ export function AddProductScreen() {
         categoria_id: Number(form.categoriaId),
         marca_id: Number(form.marcaId),
         modelo_id: Number(form.modeloId),
-        foto: form.foto.trim(),
+        foto: "",
         precio: Number(form.precio),
         stock: Number(form.stock),
         descripcion: form.descripcion.trim(),
       });
+      if (fotoFile) {
+        try {
+          await api.subirImagenArticulo(nuevo.id, fotoFile);
+        } catch (error) {
+          toast.error(mensajeDeError(error, "Artículo guardado, pero la foto no se pudo subir"));
+        }
+      }
       toast.success("Artículo agregado al inventario");
       router.push(`/products/${nuevo.id}`);
     } catch (error) {
@@ -230,26 +236,8 @@ export function AddProductScreen() {
               FOTOGRAFÍA
             </CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-col gap-4 sm:flex-row sm:items-start">
-            <div className="flex-1 space-y-2">
-              <Label htmlFor="foto">URL de la imagen (opcional)</Label>
-              <Input
-                id="foto"
-                value={form.foto}
-                onChange={(e) => set("foto", e.target.value)}
-                placeholder="https://..."
-                className="h-10"
-              />
-              <p className="text-xs text-muted-foreground">
-                Si no agregás foto se mostrará el distintivo de Rivera Imports.
-              </p>
-            </div>
-            <FotoArticulo
-              src={form.foto.trim()}
-              alt="Vista previa"
-              className="h-28 w-28 shrink-0 rounded-md"
-              sizes="112px"
-            />
+          <CardContent>
+            <SubirFotoArticulo fotoActual="" nombre={form.nombre} onFileChange={setFotoFile} />
           </CardContent>
         </Card>
 

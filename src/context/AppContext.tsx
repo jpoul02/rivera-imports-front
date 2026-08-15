@@ -2,15 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { api } from "@/lib/api";
-import type { AppConfig as ApiAppConfig, Articulo, Usuario, Venta, UserRole } from "@/types";
-
-interface AppUsuario {
-  id: number;
-  nombre: string;
-  usuario: string;
-  rol: UserRole;
-  activo: boolean;
-}
+import type { AppConfig as ApiAppConfig, Articulo, Venta } from "@/types";
 
 interface AppVenta {
   id: number;
@@ -37,13 +29,10 @@ interface AppConfig {
 interface AppState {
   articulos: Articulo[];
   ventas: AppVenta[];
-  usuarios: AppUsuario[];
   config: AppConfig;
 }
 
 interface AppContextValue extends AppState {
-  addUsuario: (usuario: Omit<AppUsuario, "id">) => void;
-  updateUsuario: (id: number, data: Partial<Omit<AppUsuario, "id">>) => void;
   updateConfig: (data: Partial<AppConfig>) => Promise<void>;
   resetDatos: () => Promise<void>;
 }
@@ -53,7 +42,6 @@ const STORAGE_KEY = "rivera-imports-app-state";
 const initialState: AppState = {
   articulos: [],
   ventas: [],
-  usuarios: [],
   config: {
     nombreNegocio: "Rivera Imports",
     umbralStockBajo: 5,
@@ -66,22 +54,6 @@ function mapConfig(config: ApiAppConfig): AppConfig {
   return {
     nombreNegocio: config.nombre_negocio,
     umbralStockBajo: config.umbral_stock_bajo,
-  };
-}
-
-function mapUsuario(usuario: Usuario): AppUsuario {
-  const rol: UserRole = usuario.roles.includes("administrador")
-    ? "administrador"
-    : usuario.roles.includes("gestor")
-      ? "gestor"
-      : "vendedor";
-
-  return {
-    id: usuario.id,
-    nombre: usuario.nombre,
-    usuario: usuario.usuario,
-    rol,
-    activo: usuario.activo,
   };
 }
 
@@ -104,10 +76,6 @@ function mapVenta(venta: Venta): AppVenta {
   };
 }
 
-function nextId(items: { id: number }[]) {
-  return items.reduce((max, item) => Math.max(max, item.id), 0) + 1;
-}
-
 function readStoredState(): AppState | null {
   if (typeof window === "undefined") return null;
 
@@ -119,7 +87,6 @@ function readStoredState(): AppState | null {
     return {
       articulos: Array.isArray(parsed.articulos) ? parsed.articulos : [],
       ventas: Array.isArray(parsed.ventas) ? parsed.ventas : [],
-      usuarios: Array.isArray(parsed.usuarios) ? parsed.usuarios : [],
       config: {
         ...initialState.config,
         ...(parsed.config ?? {}),
@@ -136,17 +103,15 @@ function persistState(state: AppState) {
 }
 
 async function loadRemoteState(): Promise<AppState> {
-  const [articulos, ventas, usuarios, config] = await Promise.all([
+  const [articulos, ventas, config] = await Promise.all([
     api.getArticulos(),
     api.getVentas(),
-    api.getUsuarios(),
     api.getConfiguracion(),
   ]);
 
   return {
     articulos,
     ventas: ventas.map(mapVenta),
-    usuarios: usuarios.map(mapUsuario),
     config: mapConfig(config),
   };
 }
@@ -178,30 +143,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return () => {
       mounted = false;
     };
-  }, []);
-
-  const addUsuario = useCallback((usuario: Omit<AppUsuario, "id">) => {
-    setState((current) => {
-      const nextState = {
-        ...current,
-        usuarios: [...current.usuarios, { ...usuario, id: nextId(current.usuarios) }],
-      };
-      persistState(nextState);
-      return nextState;
-    });
-  }, []);
-
-  const updateUsuario = useCallback((id: number, data: Partial<Omit<AppUsuario, "id">>) => {
-    setState((current) => {
-      const nextState = {
-        ...current,
-        usuarios: current.usuarios.map((usuario) =>
-          usuario.id === id ? { ...usuario, ...data } : usuario
-        ),
-      };
-      persistState(nextState);
-      return nextState;
-    });
   }, []);
 
   const updateConfig = useCallback(async (data: Partial<AppConfig>) => {
@@ -236,8 +177,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     <AppContext.Provider
       value={{
         ...state,
-        addUsuario,
-        updateUsuario,
         updateConfig,
         resetDatos,
       }}
