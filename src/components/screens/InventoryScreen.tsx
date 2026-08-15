@@ -2,17 +2,20 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { toast } from "sonner";
 import { Search, SlidersHorizontal, X, Plus } from "lucide-react";
-import { api } from "@/lib/api";
+import { api, mensajeDeError } from "@/lib/api";
 import { useFetch } from "@/hooks/use-fetch";
 import { useAuth } from "@/context/AuthContext";
 import { formatMoney } from "@/lib/format";
+import type { Articulo } from "@/types";
 import { FotoArticulo } from "@/components/common/FotoArticulo";
 import { ComboboxSelect } from "@/components/common/ComboboxSelect";
 import { Paginacion } from "@/components/common/Paginacion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -31,7 +34,7 @@ import {
 
 export function InventoryScreen() {
   const { hasPermiso } = useAuth();
-  const { data: articulos, loading } = useFetch(api.getArticulos);
+  const { data: articulos, loading, refetch: refetchArticulos } = useFetch(api.getArticulos);
   const { data: catalogos } = useFetch(api.getCatalogos);
   const { data: config } = useFetch(api.getConfiguracion);
 
@@ -76,6 +79,15 @@ export function InventoryScreen() {
     setMarcaId("");
     setSoloStockBajo(false);
     setPagina(1);
+  };
+
+  const togglePublico = async (a: Articulo) => {
+    try {
+      await api.actualizarArticulo(a.id, { visible_publico: !a.visible_publico });
+      refetchArticulos();
+    } catch (error) {
+      toast.error(mensajeDeError(error, "No se pudo actualizar"));
+    }
   };
 
   const stockBadge = (stock: number) => {
@@ -210,6 +222,9 @@ export function InventoryScreen() {
               <TableHead>Marca / Modelo</TableHead>
               <TableHead className="text-right">Precio</TableHead>
               <TableHead className="text-right">Stock</TableHead>
+              {hasPermiso("articulos_gestionar") && (
+                <TableHead className="text-center">Público</TableHead>
+              )}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -246,11 +261,27 @@ export function InventoryScreen() {
                   {formatMoney(a.precio)}
                 </TableCell>
                 <TableCell className="text-right">{stockBadge(a.stock)}</TableCell>
+                {hasPermiso("articulos_gestionar") && (
+                  <TableCell className="text-center">
+                    <Switch
+                      checked={a.visible_publico}
+                      onCheckedChange={() => togglePublico(a)}
+                      aria-label={
+                        a.visible_publico
+                          ? "Ocultar del catálogo público"
+                          : "Mostrar en catálogo público"
+                      }
+                    />
+                  </TableCell>
+                )}
               </TableRow>
             ))}
             {filtrados.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} className="py-12 text-center text-muted-foreground">
+                <TableCell
+                  colSpan={hasPermiso("articulos_gestionar") ? 7 : 6}
+                  className="py-12 text-center text-muted-foreground"
+                >
                   No hay artículos que coincidan con los filtros.
                 </TableCell>
               </TableRow>

@@ -22,6 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -74,6 +75,7 @@ export function ProductDetailScreen({ id }: { id: string }) {
     foto: "",
     precio: "",
     descripcion: "",
+    visiblePublico: false,
   });
   const [ajuste, setAjuste] = useState({
     tipo: "entrada" as "entrada" | "salida",
@@ -122,6 +124,7 @@ export function ProductDetailScreen({ id }: { id: string }) {
       foto: articulo.foto,
       precio: String(articulo.precio),
       descripcion: articulo.descripcion,
+      visiblePublico: articulo.visible_publico,
     });
     setEditOpen(true);
   };
@@ -145,6 +148,7 @@ export function ProductDetailScreen({ id }: { id: string }) {
         foto: edit.foto.trim(),
         precio,
         descripcion: edit.descripcion.trim(),
+        visible_publico: edit.visiblePublico,
       });
       setEditOpen(false);
       toast.success("Artículo actualizado");
@@ -489,6 +493,18 @@ export function ProductDetailScreen({ id }: { id: string }) {
                 value={edit.descripcion}
                 onChange={(e) => setEdit((f) => ({ ...f, descripcion: e.target.value }))}
                 rows={3}
+              />
+            </div>
+            <div className="flex items-center justify-between rounded-md border p-3">
+              <div>
+                <p className="text-sm font-medium">Mostrar en catálogo público</p>
+                <p className="text-xs text-muted-foreground">
+                  Visible para cualquier visitante en /catalogo
+                </p>
+              </div>
+              <Switch
+                checked={edit.visiblePublico}
+                onCheckedChange={(v) => setEdit((f) => ({ ...f, visiblePublico: v }))}
               />
             </div>
           </div>
