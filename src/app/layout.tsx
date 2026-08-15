@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Saira, Saira_Condensed, Geist_Mono } from "next/font/google";
+import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/context/AuthContext";
 import { AppProvider } from "@/context/AppContext";
@@ -34,13 +35,16 @@ export default function RootLayout({
   return (
     <html
       lang="es"
+      suppressHydrationWarning
       className={`${saira.variable} ${sairaCondensed.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <AuthProvider>
-          <AppProvider>{children}</AppProvider>
-        </AuthProvider>
-        <Toaster position="top-right" richColors />
+        <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange>
+          <AuthProvider>
+            <AppProvider>{children}</AppProvider>
+          </AuthProvider>
+          <Toaster position="top-right" richColors />
+        </ThemeProvider>
       </body>
     </html>
   );

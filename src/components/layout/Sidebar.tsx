@@ -8,6 +8,7 @@ import { menuItemsFor } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/common/ThemeToggle";
 
 export function LogoRivera({ compact = false }: { compact?: boolean }) {
   return (
@@ -93,6 +94,7 @@ export function SidebarFooter() {
             {user.roles.join(" · ") || "sin rol"}
           </p>
         </div>
+        <ThemeToggle />
         <Button
           variant="ghost"
           size="icon-sm"
