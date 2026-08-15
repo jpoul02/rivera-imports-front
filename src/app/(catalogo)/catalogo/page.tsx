@@ -2,12 +2,12 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { Search } from "lucide-react";
 import { api } from "@/lib/api";
 import { useFetch } from "@/hooks/use-fetch";
 import { formatMoney } from "@/lib/format";
 import { FotoArticulo } from "@/components/common/FotoArticulo";
+import { BlueprintRotor } from "@/components/common/BlueprintRotor";
 import { Paginacion } from "@/components/common/Paginacion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -64,15 +64,8 @@ export default function CatalogoPage() {
               consultá disponibilidad por WhatsApp.
             </p>
           </div>
-          <div className="flex justify-center lg:col-span-2">
-            <Image
-              src="/logo.svg"
-              alt="Rivera Imports"
-              width={320}
-              height={400}
-              className="h-auto w-48 drop-shadow-2xl sm:w-56 lg:w-64"
-              priority
-            />
+          <div className="hidden justify-center lg:col-span-2 lg:flex">
+            <BlueprintRotor className="h-auto w-56 max-w-none lg:w-64" />
           </div>
         </div>
         <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-1 racing-stripe" />
