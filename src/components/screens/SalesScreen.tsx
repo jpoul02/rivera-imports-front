@@ -8,6 +8,7 @@ import { useFetch } from "@/hooks/use-fetch";
 import { formatMoney, formatDateTime } from "@/lib/format";
 import { FotoArticulo } from "@/components/common/FotoArticulo";
 import { ComboboxSelect } from "@/components/common/ComboboxSelect";
+import { Paginacion } from "@/components/common/Paginacion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -43,9 +44,24 @@ export function SalesScreen({ defaultTab }: { defaultTab: string }) {
   const [direccion, setDireccion] = useState("");
   const [notas, setNotas] = useState("");
   const [enviando, setEnviando] = useState(false);
+  const [paginaHistorial, setPaginaHistorial] = useState(1);
+  const porPaginaHistorial = 20;
 
   const articulo = (articulos ?? []).find((a) => String(a.id) === articuloId);
   const total = articulo ? articulo.precio * cantidad : 0;
+
+  const totalPaginasHistorial = Math.max(
+    1,
+    Math.ceil((ventas ?? []).length / porPaginaHistorial)
+  );
+  const ventasPaginadas = useMemo(
+    () =>
+      (ventas ?? []).slice(
+        (paginaHistorial - 1) * porPaginaHistorial,
+        paginaHistorial * porPaginaHistorial
+      ),
+    [ventas, paginaHistorial]
+  );
 
   const disponibles = useMemo(
     () =>
@@ -78,8 +94,8 @@ export function SalesScreen({ defaultTab }: { defaultTab: string }) {
       toast.error(`Cantidad inválida — hay ${articulo.stock} unidades disponibles`);
       return;
     }
-    if (tipoVenta === "web" && (!departamento || !direccion.trim())) {
-      toast.error("Las ventas web necesitan departamento y dirección de envío");
+    if (!departamento || !direccion.trim()) {
+      toast.error("Completá departamento y dirección");
       return;
     }
     setEnviando(true);
@@ -90,7 +106,8 @@ export function SalesScreen({ defaultTab }: { defaultTab: string }) {
         tipo_venta: tipoVenta,
         cliente_nombre: clienteNombre.trim(),
         cliente_telefono: clienteTelefono.trim(),
-        ...(tipoVenta === "web" && { departamento, direccion: direccion.trim() }),
+        departamento,
+        direccion: direccion.trim(),
         notas: notas.trim(),
       });
       toast.success(`Venta registrada — ${formatMoney(total)}`);
@@ -226,29 +243,29 @@ export function SalesScreen({ defaultTab }: { defaultTab: string }) {
                   </div>
                 </div>
 
-                {tipoVenta === "web" && (
-                  <div className="grid gap-5 rounded-md border border-primary/20 bg-primary/[0.03] p-4 sm:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label>Departamento</Label>
-                      <ComboboxSelect
-                        items={DEPARTAMENTOS.map((d) => ({ value: d, label: d }))}
-                        value={departamento}
-                        onChange={setDepartamento}
-                        placeholder="Seleccionar..."
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="direccion">Dirección de envío</Label>
-                      <Input
-                        id="direccion"
-                        value={direccion}
-                        onChange={(e) => setDireccion(e.target.value)}
-                        placeholder="Colonia, calle, número..."
-                        className="h-10"
-                      />
-                    </div>
+                <div className="grid gap-5 rounded-md border border-primary/20 bg-primary/3 p-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label>Departamento</Label>
+                    <ComboboxSelect
+                      items={DEPARTAMENTOS.map((d) => ({ value: d, label: d }))}
+                      value={departamento}
+                      onChange={setDepartamento}
+                      placeholder="Seleccionar..."
+                    />
                   </div>
-                )}
+                  <div className="space-y-2">
+                    <Label htmlFor="direccion">
+                      {tipoVenta === "web" ? "Dirección de envío" : "Dirección"}
+                    </Label>
+                    <Input
+                      id="direccion"
+                      value={direccion}
+                      onChange={(e) => setDireccion(e.target.value)}
+                      placeholder="Colonia, calle, número..."
+                      className="h-10"
+                    />
+                  </div>
+                </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="notas">Notas (opcional)</Label>
@@ -341,7 +358,7 @@ export function SalesScreen({ defaultTab }: { defaultTab: string }) {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {(ventas ?? []).map((v) => (
+                {ventasPaginadas.map((v) => (
                   <TableRow key={v.id}>
                     <TableCell className="text-sm whitespace-nowrap">
                       {formatDateTime(v.fecha)}
@@ -381,6 +398,20 @@ export function SalesScreen({ defaultTab }: { defaultTab: string }) {
               </TableBody>
             </Table>
           </Card>
+          {(ventas ?? []).length > 0 && (
+            <div className="mt-4 flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">
+                {(paginaHistorial - 1) * porPaginaHistorial + 1}–
+                {Math.min(paginaHistorial * porPaginaHistorial, (ventas ?? []).length)} de{" "}
+                {(ventas ?? []).length}
+              </p>
+              <Paginacion
+                pagina={paginaHistorial}
+                totalPaginas={totalPaginasHistorial}
+                onCambiar={setPaginaHistorial}
+              />
+            </div>
+          )}
         </TabsContent>
       </Tabs>
     </div>
