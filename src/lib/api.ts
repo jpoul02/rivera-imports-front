@@ -104,11 +104,20 @@ export const api = {
   crearCategoria: async (nombre: string) =>
     apiClient.post("/catalogos/categorias", { nombre }),
   eliminarCategoria: async (id: number) => apiClient.delete(`/catalogos/categorias/${id}`),
+  reasignarYEliminarCategoria: async (id: number, destinoId: number) =>
+    apiClient.post(`/catalogos/categorias/${id}/reasignar`, { destino_id: destinoId }),
   crearMarca: async (nombre: string) => apiClient.post("/catalogos/marcas", { nombre }),
   eliminarMarca: async (id: number) => apiClient.delete(`/catalogos/marcas/${id}`),
+  reasignarYEliminarMarca: async (id: number, destinoMarcaId: number, destinoModeloId: number) =>
+    apiClient.post(`/catalogos/marcas/${id}/reasignar`, {
+      destino_marca_id: destinoMarcaId,
+      destino_modelo_id: destinoModeloId,
+    }),
   crearModelo: async (nombre: string, marca_id: number) =>
     apiClient.post("/catalogos/modelos", { nombre, marca_id }),
   eliminarModelo: async (id: number) => apiClient.delete(`/catalogos/modelos/${id}`),
+  reasignarYEliminarModelo: async (id: number, destinoId: number) =>
+    apiClient.post(`/catalogos/modelos/${id}/reasignar`, { destino_id: destinoId }),
 
   // Ventas
   getVentas: async () => (await apiClient.get<Venta[]>("/ventas")).data,
