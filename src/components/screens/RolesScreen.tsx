@@ -140,12 +140,19 @@ export function RolesScreen() {
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
+              {editando?.es_sistema && (
+                <p className="rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">
+                  Rol de sistema — nombre y permisos son fijos. Sólo se puede editar la
+                  descripción.
+                </p>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="r-nombre">Nombre</Label>
                 <Input
                   id="r-nombre"
                   value={nombre}
                   onChange={(e) => setNombre(e.target.value)}
+                  disabled={editando?.es_sistema}
                   className="h-10"
                 />
               </div>
@@ -166,6 +173,7 @@ export function RolesScreen() {
                       <Checkbox
                         checked={permisosSeleccionados.includes(p.clave)}
                         onCheckedChange={() => togglePermiso(p.clave)}
+                        disabled={editando?.es_sistema}
                       />
                       <span>{p.etiqueta}</span>
                     </label>
