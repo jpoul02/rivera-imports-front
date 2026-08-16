@@ -173,11 +173,6 @@ export default function LoginPage() {
               Iniciar sesión
             </Button>
           </form>
-
-          <p className="mt-6 text-center text-xs text-muted-foreground">
-            Demo: <span className="font-mono">raul / karla / diego</span> · contraseña{" "}
-            <span className="font-mono">rivera123</span>
-          </p>
         </div>
       </div>
     </div>
