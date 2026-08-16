@@ -1,5 +1,12 @@
 import axios, { AxiosError } from "axios";
 import { loginAction, logoutAction } from "@/actions/auth.actions";
+
+declare module "axios" {
+  export interface AxiosRequestConfig {
+    /** Un 401 en este request no dispara el redirect duro del interceptor. */
+    skipAuthRedirect?: boolean;
+  }
+}
 import type {
   AnalyticsData,
   AppConfig,
@@ -25,7 +32,8 @@ apiClient.interceptors.response.use(
     if (
       error.response?.status === 401 &&
       typeof window !== "undefined" &&
-      !window.location.pathname.startsWith("/login")
+      !window.location.pathname.startsWith("/login") &&
+      !error.config?.skipAuthRedirect
     ) {
       window.location.href = "/login";
     }
@@ -51,7 +59,11 @@ export const api = {
     return result.usuario;
   },
   logout: async () => logoutAction(),
-  me: async () => (await apiClient.get<Usuario>("/auth/me")).data,
+  // skipAuthRedirect: esto es el chequeo inicial de sesión — un 401 acá
+  // solo significa "no hay sesión todavía", no amerita el redirect duro
+  // del interceptor (eso rompía el reintento de AuthContext en cada reload).
+  me: async () =>
+    (await apiClient.get<Usuario>("/auth/me", { skipAuthRedirect: true })).data,
 
   // Artículos
   getArticulos: async () => (await apiClient.get<Articulo[]>("/articulos")).data,
