@@ -22,12 +22,28 @@ async function forward(request: Request, { params }: Ctx) {
   const hasBody = !["GET", "HEAD"].includes(request.method);
 
   try {
-    return await fetch(targetUrl, {
+    const upstream = await fetch(targetUrl, {
       method: request.method,
       headers,
       body: hasBody ? request.body : undefined,
       ...(hasBody ? { duplex: "half" } : {}),
     } as RequestInit);
+
+    // fetch() ya descomprime el body — reenviar el Content-Encoding
+    // original del backend hace que el navegador intente descomprimir
+    // bytes que ya están planos (net::ERR_CONTENT_DECODING_FAILED).
+    // content-length/transfer-encoding tampoco aplican: dejar que el
+    // server de Next calcule el framing de la respuesta que sí manda.
+    const responseHeaders = new Headers(upstream.headers);
+    responseHeaders.delete("content-encoding");
+    responseHeaders.delete("content-length");
+    responseHeaders.delete("transfer-encoding");
+
+    return new Response(upstream.body, {
+      status: upstream.status,
+      statusText: upstream.statusText,
+      headers: responseHeaders,
+    });
   } catch {
     return Response.json({ detail: "No se pudo conectar con el servidor" }, { status: 502 });
   }
