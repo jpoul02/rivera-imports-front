@@ -12,6 +12,64 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
+function BadgeConConfirmacion({
+  nombre,
+  onConfirmar,
+}: {
+  nombre: string;
+  onConfirmar: () => Promise<void>;
+}) {
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <button
+          type="button"
+          className="rounded-sm p-0.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+          aria-label={`Eliminar ${nombre}`}
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>¿Eliminar «{nombre}»?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Si hay artículos del inventario usando «{nombre}», el sistema no va a
+            dejar borrarlo. Movelos a otra opción primero si querés liberarlo.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel className="h-10">Cancelar</AlertDialogCancel>
+          <AlertDialogAction
+            className="h-10 bg-destructive text-white hover:bg-destructive/90"
+            onClick={async () => {
+              try {
+                await onConfirmar();
+                toast.success(`«${nombre}» eliminado`);
+              } catch (error) {
+                toast.error(mensajeDeError(error, "No se pudo eliminar"));
+              }
+            }}
+          >
+            Sí, eliminar
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
 
 function ListaEditable({
   titulo,
@@ -72,21 +130,7 @@ function ListaEditable({
               className="gap-1.5 py-1.5 pr-1.5 pl-3 text-sm font-normal"
             >
               {item.nombre}
-              <button
-                type="button"
-                onClick={async () => {
-                  try {
-                    await onRemove(item);
-                    toast.success(`«${item.nombre}» eliminado`);
-                  } catch (error) {
-                    toast.error(mensajeDeError(error, "No se pudo eliminar"));
-                  }
-                }}
-                className="rounded-sm p-0.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                aria-label={`Eliminar ${item.nombre}`}
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
+              <BadgeConConfirmacion nombre={item.nombre} onConfirmar={() => onRemove(item)} />
             </Badge>
           ))}
           {items.length === 0 && (
@@ -217,22 +261,13 @@ export function CatalogsScreen() {
                         className="gap-1.5 py-1.5 pr-1.5 pl-3 text-sm font-normal"
                       >
                         {modelo.nombre}
-                        <button
-                          type="button"
-                          onClick={async () => {
-                            try {
-                              await api.eliminarModelo(modelo.id);
-                              toast.success(`«${modelo.nombre}» eliminado`);
-                              refetch();
-                            } catch (error) {
-                              toast.error(mensajeDeError(error, "No se pudo eliminar"));
-                            }
+                        <BadgeConConfirmacion
+                          nombre={modelo.nombre}
+                          onConfirmar={async () => {
+                            await api.eliminarModelo(modelo.id);
+                            refetch();
                           }}
-                          className="rounded-sm p-0.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                          aria-label={`Eliminar ${modelo.nombre}`}
-                        >
-                          <X className="h-3.5 w-3.5" />
-                        </button>
+                        />
                       </Badge>
                     ))}
                     {modelos.length === 0 && (
