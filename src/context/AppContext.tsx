@@ -34,7 +34,6 @@ interface AppState {
 
 interface AppContextValue extends AppState {
   updateConfig: (data: Partial<AppConfig>) => Promise<void>;
-  resetDatos: () => Promise<void>;
 }
 
 const STORAGE_KEY = "rivera-imports-app-state";
@@ -162,23 +161,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const resetDatos = useCallback(async () => {
-    window.localStorage.removeItem(STORAGE_KEY);
-    try {
-      const nextState = await loadRemoteState();
-      setState(nextState);
-      persistState(nextState);
-    } catch {
-      setState(initialState);
-    }
-  }, []);
-
   return (
     <AppContext.Provider
       value={{
         ...state,
         updateConfig,
-        resetDatos,
       }}
     >
       {children}
