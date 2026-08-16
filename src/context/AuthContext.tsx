@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 import type { Usuario } from "@/types";
 import { api } from "@/lib/api";
 import { homePath } from "@/lib/permissions";
@@ -25,11 +26,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    api
-      .me()
-      .then(setUser)
-      .catch(() => {})
-      .finally(() => setIsLoading(false));
+    // Si falla por algo que no sea un 401 real (blip de red, backend caído
+    // un instante), reintenta una vez antes de tratarlo como sesión inválida.
+    const cargarSesion = async () => {
+      for (let intento = 0; intento < 2; intento++) {
+        try {
+          setUser(await api.me());
+          return;
+        } catch (error) {
+          const noAutorizado = axios.isAxiosError(error) && error.response?.status === 401;
+          if (noAutorizado || intento === 1) return;
+          await new Promise((r) => setTimeout(r, 800));
+        }
+      }
+    };
+    cargarSesion().finally(() => setIsLoading(false));
   }, []);
 
   const login = useCallback(
