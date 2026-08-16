@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import type { Usuario } from "@/types";
-import { api, TOKEN_KEY } from "@/lib/api";
+import { api } from "@/lib/api";
 import { homePath } from "@/lib/permissions";
 
 interface AuthContextType {
@@ -25,34 +25,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem(TOKEN_KEY);
-    if (!token) {
-      setIsLoading(false);
-      return;
-    }
     api
       .me()
       .then(setUser)
-      .catch(() => localStorage.removeItem(TOKEN_KEY))
+      .catch(() => {})
       .finally(() => setIsLoading(false));
   }, []);
 
   const login = useCallback(
     async (usuario: string, password: string) => {
-      const data = await api.login(usuario, password);
-      localStorage.setItem(TOKEN_KEY, data.access_token);
-      setUser(data.usuario);
+      const usuarioData = await api.login(usuario, password);
+      setUser(usuarioData);
       router.push(
-        data.usuario.debe_cambiar_password ? "/cambiar-password" : homePath(data.usuario.permisos)
+        usuarioData.debe_cambiar_password ? "/cambiar-password" : homePath(usuarioData.permisos)
       );
     },
     [router]
   );
 
   const logout = useCallback(() => {
-    localStorage.removeItem(TOKEN_KEY);
-    setUser(null);
-    router.push("/login");
+    api.logout().finally(() => {
+      setUser(null);
+      router.push("/login");
+    });
   }, [router]);
 
   const refreshUser = useCallback(async () => {

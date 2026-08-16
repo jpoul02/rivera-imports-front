@@ -1,4 +1,5 @@
 import axios, { AxiosError } from "axios";
+import { loginAction, logoutAction } from "@/actions/auth.actions";
 import type {
   AnalyticsData,
   AppConfig,
@@ -14,18 +15,8 @@ import type {
   Venta,
 } from "@/types";
 
-export const TOKEN_KEY = "rivera-imports-token";
-
 export const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000",
-});
-
-apiClient.interceptors.request.use((config) => {
-  if (typeof window !== "undefined") {
-    const token = localStorage.getItem(TOKEN_KEY);
-    if (token) config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
+  baseURL: "/api/proxy",
 });
 
 apiClient.interceptors.response.use(
@@ -36,7 +27,6 @@ apiClient.interceptors.response.use(
       typeof window !== "undefined" &&
       !window.location.pathname.startsWith("/login")
     ) {
-      localStorage.removeItem(TOKEN_KEY);
       window.location.href = "/login";
     }
     return Promise.reject(error);
@@ -49,19 +39,18 @@ export function mensajeDeError(error: unknown, fallback = "Ocurrió un error"): 
     if (typeof detail === "string") return detail;
     if (error.code === "ERR_NETWORK") return "No se pudo conectar con el servidor";
   }
+  if (error instanceof Error && error.message) return error.message;
   return fallback;
 }
 
 export const api = {
   // Auth
   login: async (usuario: string, password: string) => {
-    const body = new URLSearchParams({ username: usuario, password });
-    const { data } = await apiClient.post<{ access_token: string; usuario: Usuario }>(
-      "/auth/login",
-      body
-    );
-    return data;
+    const result = await loginAction(usuario, password);
+    if (!result.success) throw new Error(result.error);
+    return result.usuario;
   },
+  logout: async () => logoutAction(),
   me: async () => (await apiClient.get<Usuario>("/auth/me")).data,
 
   // Artículos

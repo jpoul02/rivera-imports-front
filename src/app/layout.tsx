@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { Saira, Saira_Condensed, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
@@ -26,11 +27,13 @@ export const metadata: Metadata = {
   description: "Gestión de inventario de repuestos y partes de automóviles",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
+
   return (
     <html
       lang="es"
@@ -38,7 +41,12 @@ export default function RootLayout({
       className={`${saira.variable} ${sairaCondensed.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          disableTransitionOnChange
+          nonce={nonce}
+        >
           <AuthProvider>{children}</AuthProvider>
           <Toaster position="top-right" richColors />
         </ThemeProvider>
