@@ -63,11 +63,11 @@ export function proxy(request: NextRequest) {
     return response;
   }
 
-  if (tokenValid && pathname === "/login") {
-    const url = request.nextUrl.clone();
-    url.pathname = "/";
-    return NextResponse.redirect(url);
-  }
+  // No redirigimos acá cuando ya hay cookie y pathname === "/login": ese
+  // gate ya lo hace login/page.tsx contra la validación real del backend
+  // (api.me()). Duplicarlo acá, validando sólo estructura/exp, puede
+  // divergir del veredicto real del backend y producir un loop de
+  // redirects (login -> "/" -> login -> ...).
 
   const response = NextResponse.next({ request: { headers: requestHeaders } });
   response.headers.set("Content-Security-Policy", csp);
