@@ -40,6 +40,7 @@ export function ListaInteresFlotante() {
       } else {
         window.location.href = url;
       }
+      limpiar();
       setOpen(false);
     } catch (error) {
       ventana?.close();
