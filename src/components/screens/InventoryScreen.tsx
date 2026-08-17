@@ -315,6 +315,18 @@ export function InventoryScreen() {
                     {stockBadge(a.stock)}
                   </div>
                 </div>
+                {hasPermiso("articulos_gestionar") && (
+                  <Switch
+                    checked={a.visible_publico}
+                    onCheckedChange={() => togglePublico(a)}
+                    onClick={(e) => e.stopPropagation()}
+                    aria-label={
+                      a.visible_publico
+                        ? "Ocultar del catálogo público"
+                        : "Mostrar en catálogo público"
+                    }
+                  />
+                )}
               </CardContent>
             </Card>
           </Link>
