@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Search, SlidersHorizontal, X, Plus } from "lucide-react";
+import { Search, SlidersHorizontal, X, Plus, ExternalLink } from "lucide-react";
 import { api, mensajeDeError } from "@/lib/api";
 import { useFetch } from "@/hooks/use-fetch";
 import { useAuth } from "@/context/AuthContext";
@@ -31,6 +31,16 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export function InventoryScreen() {
   const { hasPermiso } = useAuth();
@@ -81,12 +91,18 @@ export function InventoryScreen() {
     setPagina(1);
   };
 
-  const togglePublico = async (a: Articulo) => {
+  const [pendingToggle, setPendingToggle] = useState<Articulo | null>(null);
+
+  const confirmTogglePublico = async () => {
+    if (!pendingToggle) return;
+    const a = pendingToggle;
     try {
       await api.actualizarArticulo(a.id, { visible_publico: !a.visible_publico });
       refetchArticulos();
     } catch (error) {
       toast.error(mensajeDeError(error, "No se pudo actualizar"));
+    } finally {
+      setPendingToggle(null);
     }
   };
 
@@ -120,14 +136,22 @@ export function InventoryScreen() {
             {filtrados.length} de {articulos?.length ?? 0} artículos
           </p>
         </div>
-        {hasPermiso("articulos_gestionar") && (
-          <Button asChild className="h-10">
-            <Link href="/products/add">
-              <Plus className="h-4 w-4" />
-              Agregar artículo
+        <div className="flex gap-2">
+          <Button asChild variant="outline" className="h-10">
+            <Link href="/catalogo" target="_blank">
+              <ExternalLink className="h-4 w-4" />
+              Ver catálogo
             </Link>
           </Button>
-        )}
+          {hasPermiso("articulos_gestionar") && (
+            <Button asChild className="h-10">
+              <Link href="/products/add">
+                <Plus className="h-4 w-4" />
+                Agregar artículo
+              </Link>
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Búsqueda y filtros */}
@@ -265,7 +289,7 @@ export function InventoryScreen() {
                   <TableCell className="text-center">
                     <Switch
                       checked={a.visible_publico}
-                      onCheckedChange={() => togglePublico(a)}
+                      onCheckedChange={() => setPendingToggle(a)}
                       aria-label={
                         a.visible_publico
                           ? "Ocultar del catálogo público"
@@ -293,9 +317,9 @@ export function InventoryScreen() {
       {/* Cards móvil */}
       <div className="grid gap-3 md:hidden">
         {paginados.map((a) => (
-          <Link key={a.id} href={`/products/${a.id}`}>
-            <Card className="py-0 transition-colors duration-150 active:bg-muted">
-              <CardContent className="flex items-center gap-3 p-3">
+          <Card key={a.id} className="py-0 transition-colors duration-150 active:bg-muted">
+            <CardContent className="flex items-center gap-3 p-3">
+              <Link href={`/products/${a.id}`} className="flex min-w-0 flex-1 items-center gap-3">
                 <FotoArticulo
                   src={a.foto}
                   alt={a.nombre}
@@ -315,21 +339,20 @@ export function InventoryScreen() {
                     {stockBadge(a.stock)}
                   </div>
                 </div>
-                {hasPermiso("articulos_gestionar") && (
-                  <Switch
-                    checked={a.visible_publico}
-                    onCheckedChange={() => togglePublico(a)}
-                    onClick={(e) => e.stopPropagation()}
-                    aria-label={
-                      a.visible_publico
-                        ? "Ocultar del catálogo público"
-                        : "Mostrar en catálogo público"
-                    }
-                  />
-                )}
-              </CardContent>
-            </Card>
-          </Link>
+              </Link>
+              {hasPermiso("articulos_gestionar") && (
+                <Switch
+                  checked={a.visible_publico}
+                  onCheckedChange={() => setPendingToggle(a)}
+                  aria-label={
+                    a.visible_publico
+                      ? "Ocultar del catálogo público"
+                      : "Mostrar en catálogo público"
+                  }
+                />
+              )}
+            </CardContent>
+          </Card>
         ))}
         {filtrados.length === 0 && (
           <p className="py-12 text-center text-sm text-muted-foreground">
@@ -349,6 +372,25 @@ export function InventoryScreen() {
           <Paginacion pagina={pagina} totalPaginas={totalPaginas} onCambiar={setPagina} />
         </div>
       )}
+
+      <AlertDialog open={!!pendingToggle} onOpenChange={(open) => !open && setPendingToggle(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {pendingToggle?.visible_publico ? "¿Ocultar del catálogo?" : "¿Mostrar en catálogo?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingToggle?.visible_publico
+                ? `"${pendingToggle?.nombre}" dejará de verse en /catalogo.`
+                : `"${pendingToggle?.nombre}" pasará a verse en /catalogo.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmTogglePublico}>Confirmar</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
