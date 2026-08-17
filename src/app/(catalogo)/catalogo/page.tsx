@@ -9,7 +9,6 @@ import { useFetch } from "@/hooks/use-fetch";
 import { formatMoney } from "@/lib/format";
 import { FotoArticulo } from "@/components/common/FotoArticulo";
 import { AgregarAListaButton } from "@/components/catalogo/AgregarAListaButton";
-import { CatalogoSplash } from "@/components/catalogo/CatalogoSplash";
 import { Paginacion } from "@/components/common/Paginacion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -44,8 +43,6 @@ export default function CatalogoPage() {
 
   return (
     <div>
-      <CatalogoSplash />
-
       {/* Hero */}
       <div className="relative isolate overflow-hidden border-b border-neutral-800">
         <Image

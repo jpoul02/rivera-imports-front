@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { Saira, Saira_Condensed, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
+import { PageTransitionSplash } from "@/components/common/PageTransitionSplash";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/context/AuthContext";
 import "./globals.css";
@@ -48,6 +49,7 @@ export default async function RootLayout({
           nonce={nonce}
         >
           <AuthProvider>{children}</AuthProvider>
+          <PageTransitionSplash />
           <Toaster position="top-right" richColors />
         </ThemeProvider>
       </body>
