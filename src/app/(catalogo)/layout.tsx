@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CatalogoFooter } from "@/components/catalogo/CatalogoFooter";
 import { CatalogoHeader } from "@/components/catalogo/CatalogoHeader";
 import { ListaInteresFlotante } from "@/components/catalogo/ListaInteresFlotante";
 import { ListaInteresProvider } from "@/context/ListaInteresContext";
@@ -11,9 +12,10 @@ export const metadata: Metadata = {
 export default function CatalogoLayout({ children }: { children: React.ReactNode }) {
   return (
     <ListaInteresProvider>
-      <div className="min-h-screen bg-background">
+      <div className="flex min-h-screen flex-col bg-background">
         <CatalogoHeader />
-        <main>{children}</main>
+        <main className="flex-1">{children}</main>
+        <CatalogoFooter />
         <ListaInteresFlotante />
       </div>
     </ListaInteresProvider>
