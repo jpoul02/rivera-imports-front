@@ -11,6 +11,9 @@ importers:
 
   .:
     dependencies:
+      '@swc/helpers':
+        specifier: ^0.5.23
+        version: 0.5.23
       axios:
         specifier: ^1.18.0
         version: 1.19.0
